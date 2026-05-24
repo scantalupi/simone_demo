@@ -1,28 +1,27 @@
+## Load needed libraries ## 
 library(readxl)
 library(tidyverse)
+library(janitor)
 
-# FDA CDER NME and New Biologic Approvals (1985–2025)
+## Load dataset ##
+# FDA - CDER NME and New Biologic Approvals (1985–2025)
 FDA <- read_excel(
-  "raw_data/2026 Compilation_of_CDER_NME_and_New_Biologic_Approvals_1985-2025.xlsx"
+  "raw_data/2026 Compilation_of_CDER_NME_and_New_Biologic_Approvals_1985-2025.xlsx",
+  guess_max = 3000
 )
 
-# EMA medicines report
-# First 8 rows are metadata; row 9 contains the real column headers
-EMA <- suppressWarnings(read_excel(
+# EMA - CHMP Approvals (1985–2025)
+EMA <- read_excel(
   "raw_data/medicines-output-medicines-report_en.xlsx",
-  sheet = "Medicine",
   skip = 8,
   guess_max = 3000
-)) |>
-  rename(
-    pharm_group_human = `Pharmacotherapeutic group\n(human)`,
-    pharm_group_vet   = `Pharmacotherapeutic group\n(veterinary)`
-  )
+)
 
-# Explore datasets 
-str(EMA)
+## Explore datasets ## 
 str(FDA)
+str(EMA)
 
-EMA |> count(pharm_group_human, sort = TRUE) |> filter(!is.na(pharm_group_human))
-
-EMA |> count(pharm_group_vet, sort = TRUE) |> filter(!is.na(pharm_group_vet))
+## Clean datasets ##
+# Standardise all column names to snake_case
+FDA <- FDA |> clean_names()
+EMA <- EMA |> clean_names()
